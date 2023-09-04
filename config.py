@@ -1,0 +1,1 @@
+GRADES_DB = 'grades.db'

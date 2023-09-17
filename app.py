@@ -1,41 +1,7 @@
-from config import *
-import sqlite3
+from sql import grades_db_exec, STUDENT_LATEST_SUBMISSION_REQ, ASSIGNMENT_LIST_REQ, FIND_STUDENT_ID_REQ, INSERT_NEW_STUDENT_REQ
 import datetime
+from orbit import ROOT, messageblock, appver, get_authorized_user
 
-# CURRENTLY HARD CODING THE STUDENT WHOSE DASHBOARD IS SHOWN
-CURR_STUDENT_ID = 2
-
-
-
-
-
-
-
-STUDENT_LATEST_SUBMISSION_REQ = """\
-SELECT
-	s.submission_id,
-	s.student_id,
-	s.assignment_id,
-	s.submission_name,
-	MAX(s.submission_date) as submission_date,
-	s.submission_grade,
-	s.submission_comments
-FROM
-	submissions s
-WHERE
-	student_id = %s
-AND
-	assignment_id = %s
-;
-"""
-
-ASSIGNMENT_LIST_REQ = """\
-SELECT
-	*
-FROM
-	assignments
-;
-"""
 
 ASSIGNMENT_TABLE_TEMPLATE = """
 <table>
@@ -78,16 +44,6 @@ def build_assignment_table(sub, assignment_name):
 
 	return ASSIGNMENT_TABLE_TEMPLATE % (assignment_name, or_dash(sub.grade), or_dash(sub.comments), dt)
 
-def grades_db_exec(command):
-	result = None
-	con = sqlite3.connect(GRADES_DB)
-	cur = con.cursor()
-	cur2 = cur.execute(command)
-	res = cur2.fetchall()
-
-	con.close()
-	return res
-
 def get_assignment_list():
 	return grades_db_exec(ASSIGNMENT_LIST_REQ)
 
@@ -98,22 +54,25 @@ def get_latest_submission(student_id, assignment_id):
 	return None
 
 def build_page(student_id):
-	page = ""
+	page = "<h1>Student Dashboard</h1><br>"
 	for assignment in get_assignment_list():
 		page += build_assignment_table(get_latest_submission(student_id, assignment[0]), assignment[1])
 		page += "<br>"
 	return page
 
 def application(env, start_response):
-	page = """
-	<head>
-		<style>
-			table, th, td {
-				border: 1px solid;
-			}
-		</style>
-	</head>
-	"""
+	with open(ROOT + '/data/header') as header:
+		page = header.read();
+	username = get_authorized_user('', env).lower()
+	tuple_list = grades_db_exec(FIND_STUDENT_ID_REQ % username)
+	print(f'{tuple_list=}')
+	if not tuple_list:
+		print('had to add student to db')
+		grades_db_exec(INSERT_NEW_STUDENT_REQ % username, commit=True)
+	tuple_list = grades_db_exec(FIND_STUDENT_ID_REQ % username)
+	((CURR_STUDENT_ID),), = tuple_list
+	print(f'{CURR_STUDENT_ID=}')
 	page += build_page(CURR_STUDENT_ID)
-	start_response('202 OK', [('Content-Type', 'text/html')])
+	page += messageblock([('appver', appver())])
+	start_response('200 OK', [('Content-Type', 'text/html')])
 	return bytes(page, 'UTF-8')

@@ -25,6 +25,17 @@ ASSIGNMENT_TABLE_TEMPLATE = """
 </table>
 """
 
+def build_assignments_list():
+	res = []
+	with open('assignments.list' ,'r') as f:
+		for line in f:
+			# comment
+			if line[0] == '#':
+				continue
+			res += (line.split(' '))
+	return res
+
+
 def make_assignment_table(foobar):
    return table([('Grade', 'Comments', 'Time Recieved')])
 
@@ -63,6 +74,11 @@ def get_latest_submission(student_id, assignment_id):
 	return None
 
 def build_page(student_id):
+
+
+	for assignment in build_assignments_list():
+		print(assignment)
+
 	page = "<h1>Student Dashboard</h1><br>"
 
 	page += "<code>\n"
@@ -71,6 +87,7 @@ def build_page(student_id):
 	page += "</code>\n"
 
 	return page
+
 
 	# for assignment in get_assignment_list():
 	#	page += build_assignment_table(get_latest_submission(student_id, assignment[0]), assignment[1])

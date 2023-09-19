@@ -6,7 +6,7 @@ from sql import grades_db_exec, \
 	FIND_STUDENT_ID_REQ, INSERT_NEW_STUDENT_REQ
 
 from orbit import ROOT, messageblock, appver, \
-	get_authorized_user, AUTH_SERVER
+	get_authorized_user, AUTH_SERVER, table
 
 
 ASSIGNMENT_TABLE_TEMPLATE = """
@@ -24,6 +24,9 @@ ASSIGNMENT_TABLE_TEMPLATE = """
 	</tr>
 </table>
 """
+
+def make_assignment_table(foobar):
+   return table([('Grade', 'Comments', 'Time Recieved')])
 
 class Submission:
 	def __init__(self, submission_tuple):
@@ -63,7 +66,8 @@ def build_page(student_id):
 	page = "<h1>Student Dashboard</h1><br>"
 
 	page += "<code>\n"
-	page += str(get_assignment_list()[0])
+	#page += str(get_assignment_list()[0])
+	page = make_assignment_table(1)
 	page += "</code>\n"
 
 	return page

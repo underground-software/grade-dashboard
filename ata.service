@@ -1,0 +1,7 @@
+[Unit]
+Description=automatic TA service
+
+[Service]
+ExecStart=/var/orbit/cano.py/mercury/on_submit.py
+WorkingDirectory=/var/orbit/email_data/logs
+Type=exec

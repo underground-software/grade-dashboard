@@ -1,4 +1,0 @@
-CREATE TABLE submissions (
-	sub_id string PRIMARY KEY,
-	user string NOT NULL,
-	time string NOT NULL);

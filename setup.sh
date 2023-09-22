@@ -7,7 +7,4 @@ cp tbreak.service $SVCDIR
 
 systemctl enable --now ata.path
 
-DB_INIT=$(mktemp)
-cat < grades.default.pre submissions.default assignments.default grades.default.post > $DB_INIT
-
-sqlite3 grades.db ".read $DB_INIT" ".exit"
+sqlite3 grades.db ".read grades.default" ".exit"

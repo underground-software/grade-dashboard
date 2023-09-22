@@ -38,12 +38,11 @@ def do_sqlite3_comm(db, comm, commit=False, fetch=False):
     DP(f'CONNECT TO {db}')
     db_con = sqlite3.connect(db)
     db_cur0 = db_con.cursor()
-    
     DP("RUN SQL: %s" % comm)
     db_cur1 = db_cur0.execute(comm)
 
     if fetch:
-        result=db_cur1.fetchone()
+        result=db_cur1.fetchall()
         DP("SQL RES: %s" % str(result))
 
     if commit:

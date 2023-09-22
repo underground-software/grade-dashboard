@@ -2,115 +2,105 @@
 
 import datetime
 from sql import grades_db_exec, \
-	STUDENT_LATEST_SUBMISSION_REQ, ASSIGNMENT_LIST_REQ, \
-	FIND_STUDENT_ID_REQ, INSERT_NEW_STUDENT_REQ
+    STUDENT_LATEST_SUBMISSION_REQ, ASSIGNMENT_LIST_REQ, \
+    FIND_STUDENT_ID_REQ, INSERT_NEW_STUDENT_REQ
+
+from loguru import logger
 
 from orbit import ROOT, messageblock, appver, \
-	get_authorized_user, AUTH_SERVER, table
+    get_authorized_user, AUTH_SERVER, table
 
+from isis import isis_table
 
-ASSIGNMENT_TABLE_TEMPLATE = """
-<table>
-	<caption> %s </caption>
-	<tr>
-		<th> Grade </th>
-		<th> Comments </th>
-		<th> Time Recieved </th>
-	</tr>
-	<tr>
-		<th> %s </th>
-		<th> %s </th>
-		<th> %s </th>
-	</tr>
-</table>
-"""
+def ta_log(msg):
+    logger.info(f'ATA: {msg}')
 
 def build_assignments_list():
-	res = []
-	with open('assignments.list' ,'r') as f:
-		for line in f:
-			# comment
-			if line[0] == '#':
-				continue
-			res += (line.split(' '))
-	return res
-
+    res = []
+    with open('assignments.list' ,'r') as f:
+        for line in f:
+            # comment
+            if line[0] == '#':
+                continue
+            res += (line.split(' '))
+    return res
 
 def make_assignment_table(foobar):
    return table([('Grade', 'Comments', 'Time Recieved')])
 
-class Submission:
-	def __init__(self, submission_tuple):
-		self.submission_id = submission_tuple[0]
-		self.student_id = submission_tuple[1]
-		self.assignment_id = submission_tuple[2]
-		self.name = submission_tuple[3]
-		self.date = submission_tuple[4]
-		self.grade = submission_tuple[5]
-		self.comments = submission_tuple[6]
-
-	def __repr__(self):
-		return "%s %s %s %s %s %s %s" % \
-			(self.submission_id, self.student_id, self.assignment_id, self.name, self.date, self.grade, self.comments)
-
-def or_dash(s):
-	return s if s else "-"
-
 def build_assignment_table(sub, assignment_name):
-	dt = "-"
-	if sub and sub.date:
-		dt = datetime.datetime.fromtimestamp(sub.date).strftime("%Y-%m-%d %H:%M:%S")
-	
+    dt = "-"
+    if sub and sub.date:
+        dt = datetime.datetime.fromtimestamp(sub.date).strftime("%Y-%m-%d %H:%M:%S")
 
-	return ASSIGNMENT_TABLE_TEMPLATE % (assignment_name, or_dash(sub.grade), or_dash(sub.comments), dt)
+    return ASSIGNMENT_TABLE_TEMPLATE % (assignment_name, or_dash(sub.grade), or_dash(sub.comments), dt)
 
 def get_assignment_list():
-	return grades_db_exec(ASSIGNMENT_LIST_REQ)
+    return grades_db_exec(ASSIGNMENT_LIST_REQ)
 
-def get_latest_submission(student_id, assignment_id):
-	tuple_list = grades_db_exec(STUDENT_LATEST_SUBMISSION_REQ.format(student_id, assignment_id))
-	if tuple_list:
-		return Submission(tuple_list[0])
-	return None
+def get_latest_submission(sid, assignment_id):
+    tuple_list = grades_db_exec(STUDENT_LATEST_SUBMISSION_REQ.format(sid, assignment_id))
+    if tuple_list:
+        return Submission(tuple_list[0])
+    return None
 
-def build_page(student_id):
+def old_build_page(sid):
+    for assignment in build_assignments_list():
+        print(assignment)
 
+    page = "<h1>Student Dashboard</h1><br>"
 
-	for assignment in build_assignments_list():
-		print(assignment)
+    page += "<code>\n"
+    #page += str(get_assignment_list()[0])
+    page = make_assignment_table(1)
+    page += "</code>\n"
 
-	page = "<h1>Student Dashboard</h1><br>"
+    return page
 
-	page += "<code>\n"
-	#page += str(get_assignment_list()[0])
-	page = make_assignment_table(1)
-	page += "</code>\n"
+def autorefresh_text(interval):
+    return bytes(f'<meta http-equiv="refresh" content="{interval}">', "UTF-8")
 
-	return page
+REFRESH_INTERVAL=2
+def build_page(user, sid, path):
+    if path == "/tab":
+        return isis_table(user)
+    return old_build_page(sid)
 
+def get_id_by_user(user):
+    # TODO
+    return 45
 
-	# for assignment in get_assignment_list():
-	#	page += build_assignment_table(get_latest_submission(student_id, assignment[0]), assignment[1])
-	#	page += "<br>"
-	# return page
+def gather_id(env):
+    path = env.get('PATH_INFO', '/dashboard')
+    ta_log(f'path: {path}')
 
-def application(env, start_response):
-	with open(ROOT + '/data/header') as header:
-		page = header.read();
-	username = get_authorized_user(AUTH_SERVER, env).lower()
+    user = get_authorized_user(AUTH_SERVER, env)
+    ta_log(f'new login by: {user}')
 
-	dbquery_result = grades_db_exec(FIND_STUDENT_ID_REQ.format(username))
-	print(f'{dbquery_result}')
+    # TODO
+    sid = get_id_by_user(user)
 
-	# if not tuple_list:
-	#	print('had to add student to db')
-		# # need student ID!
+    ta_log(f'found student id: {sid}')
 
-	#	grades_db_exec(INSERT_NEW_STUDENT_REQ.format(student_id, username), commit=True)
+    return (user, sid, path)
 
-	dbquery_result = grades_db_exec(FIND_STUDENT_ID_REQ.format(username))
-	print(f'{dbquery_result}')
-	page += build_page(dbquery_result)
-	page += messageblock([('appver', appver())])
-	start_response('200 OK', [('Content-Type', 'text/html')])
-	return bytes(page, 'UTF-8')
+def application(env, SR):
+    path = env.get('PATH_INFO', '/dashboard')
+    ta_log(f'path: {path}')
+
+    if path == "/devheader":
+        SR('200 OK', [('Content-Type', 'text/plain')])
+        return autorefresh_text(REFRESH_INTERVAL)
+
+    (user, sid, path) = gather_id(env)
+    page = ""
+
+    with open(ROOT + '/data/header') as header:
+        page += header.read();
+
+    page += build_page(user, sid, path)
+    page += messageblock([('appver', appver())])
+
+    SR('200 OK', [('Content-Type', 'text/html')])
+
+    return bytes(page, 'UTF-8')

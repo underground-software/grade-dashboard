@@ -2,25 +2,24 @@
 
 # builds the 'international student information system' html table
 
-from orbit import table
-
+from datetime import datetime
+import random
 from common import get_sub_by_user
+
+from orbit import table
 
 # REVISION INDEX | DATETIME RECV | COMMENTS | GRADE
 def isis_table(user):
-
     subs = get_sub_by_user(user)
-    print("SUBS")
-    print(subs)
-    i=0
-    for sub in subs:
-        print("SUB ", i)
-        i+=1
-        print(sub)
-    
 
     fmt = []
-    fmt += [('Submission #', 'Summary',  'Comment', 'Grade')]
+    fmt += [('Submission #', 'Time Recieved', 'Summary',  'Comment', 'Grade')]
+
+    i = 0
+    for sub in subs:
+        fmt += [(i, str(datetime.fromtimestamp(sub[2])), 'lorem', 'ipsum', random.choices(['A','C','F'])[0])]
+        i += 1
+
     output = table(fmt)
 
     return output

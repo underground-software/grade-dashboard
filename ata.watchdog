@@ -1,0 +1,29 @@
+#!/bin/bash
+
+INTERVAL=60
+
+cleanup() {
+	echo "come down"
+	exit 0
+}
+
+trap cleanup INT
+
+echo "come up at ${INTERVAL} second interval"
+
+restart_if_down() {
+	if ! systemctl -q is-active $1; then
+		echo "poke  dead ata"
+		if ! systemctl restart $1; then
+			echo "ata refuses to restart!!!"
+			exit 1
+		fi
+	fi
+}
+
+while true; do
+	echo "trigger timer"
+	restart_if_down ata.path
+	restart_if_down tbreak
+	sleep $INTERVAL
+done

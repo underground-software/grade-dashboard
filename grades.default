@@ -1,0 +1,7 @@
+PRAGMA foreign_keys=OFF;
+BEGIN TRANSACTION;
+CREATE TABLE submissions (
+	sub_id string PRIMARY KEY,
+	user string NOT NULL,
+	time string NOT NULL);
+COMMIT;

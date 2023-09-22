@@ -18,8 +18,10 @@ X=$((${N} - ${O}))
 new=$(mktemp)
 head -n $X <(ls -t) > $new
 
+# handle case of more than one new id
 while read -r subid; do
 	time=$(awk 'NR==1 {print $1}' < $LOGDIR/$subid)
 	user=$(awk 'NR==1 {print $2}' < $LOGDIR/$subid)
 	$SCRIPT_DIR/onsub.py $subid $user $time
 done < $new
+rm -f $new

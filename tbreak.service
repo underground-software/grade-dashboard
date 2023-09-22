@@ -4,3 +4,4 @@ Description=take a tolerance break
 [Service]
 ExecStart=/var/orbit/cano.py/mercury/tbreak.sh
 WorkingDirectory=/var/orbit/cano.py/mercury
+Type=exec

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+
+export SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+source $SCRIPT_DIR/ata.conf
+
+NAME=${1:-ata}
+PTH=$EMAIL_DIR/$NAME.log
+
+echo "start monitor for $NAME on $PTH"
+touch $PTH && tail -f $PTH

@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# ata.info: get info on automated TA status
+
+sysactive() {
+	systemctl is-active $1
+}
+
+MD=/var/orbit/email_data/
+echo "mail count: 		$(ls $MD/mail | wc -l)"
+echo "mail_ready count:	$(ls $MD/mail_ready | wc -l)"
+echo "ata.path status:	$(sysactive ata.path)"
+echo "ata status:		$(sysactive ata.service)"
+echo "tbreak status:		$(sysactive tbreak.service)"
+echo "canopy status:		$(sysactive canopy.service)"
+echo "smtp status:		$(sysactive smtp.socket)"
+echo "pop status:		$(sysactive pop.socket)"

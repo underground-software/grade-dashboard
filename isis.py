@@ -14,9 +14,9 @@ def isis_table(ass_pair, subs):
 
     i = 0
     for sub in subs:
-        fmt += [(i, str(datetime.fromtimestamp(sub[2])), 'lorem', 'ipsum', random.choices(['A','C','F'])[0])]
+        fmt += [(i, str(datetime.fromtimestamp(sub[2])), 'lorem', 'ipsum',
+            random.choices(['A','B','C','D','F'])[0])]
         i += 1
-
 
     return table(fmt)
 

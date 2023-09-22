@@ -19,6 +19,23 @@ FROM submissions
 WHERE user = "{}";
 """.strip()
 
+GET_ASS_BY_EMAIL_ID="""
+SELECT web_id, email_id
+FROM assignments
+WHERE email_id = "{}";
+""".strip()
+
+GET_ASS_BY_WEB_ID="""
+SELECT web_id, email_id
+FROM assignments
+WHERE web_id = "{}";
+""".strip()
+
+GET_ASS="""
+SELECT *
+FROM assignments;
+""".strip()
+
 TA_DIR=os.path.dirname(os.path.abspath(__file__))
 GRADES_DB=f'{TA_DIR}/grades.db'
 
@@ -30,6 +47,15 @@ def get_sub_by_id(sub_id):
 
 def get_sub_by_user(sub_id):
     return do_sqlite3_comm(GRADES_DB, GET_SUB_BY_USER.format(sub_id), fetch=True)
+
+def get_ass_by_web_id(web_id):
+    return do_sqlite3_comm(GRADES_DB, GET_ASS_BY_WEB_ID.format(web_id), fetch=True)
+
+def get_ass():
+    return do_sqlite3_comm(GRADES_DB, GET_ASS, fetch=True)
+
+def get_ass_by_email_id(email_id):
+    return do_sqlite3_comm(GRADES_DB, GET_ASS_BY_WEB_ID.format(email_id), fetch=True)
 
 DP=lambda x: print(x, file=sys.stderr)
 

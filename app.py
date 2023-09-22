@@ -10,7 +10,7 @@ from loguru import logger
 from orbit import ROOT, messageblock, appver, \
     get_authorized_user, AUTH_SERVER, table
 
-from isis import isis_table
+from isis import isis
 
 def ta_log(msg):
     logger.info(f'ATA: {msg}')
@@ -62,9 +62,7 @@ def autorefresh_text(interval):
 
 REFRESH_INTERVAL=2
 def build_page(user, sid, path):
-    if path == "/tab":
-        return isis_table(user)
-    return old_build_page(sid)
+    return isis(user)
 
 def get_id_by_user(user):
     # TODO
@@ -85,13 +83,6 @@ def gather_id(env):
     return (user, sid, path)
 
 def application(env, SR):
-    path = env.get('PATH_INFO', '/dashboard')
-    ta_log(f'path: {path}')
-
-    if path == "/devheader":
-        SR('200 OK', [('Content-Type', 'text/plain')])
-        return autorefresh_text(REFRESH_INTERVAL)
-
     (user, sid, path) = gather_id(env)
     page = ""
 

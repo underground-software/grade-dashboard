@@ -1,10 +1,13 @@
 #!/bin/bash
 
+SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+cd $SCRIPT_DIR
+
+
+
 sqlite3 grades.db <<EOF
 DROP TABLE submissions;
+DROP TABLE assignments;
 EOF
 
-DB_INIT=$(mktemp)
-cat < $(cat grades.db.recipe) > $DB_INIT
-
-sqlite3 grades.db ".read $DB_INIT" ".exit"
+$SCRIPT_DIR/setup.sh

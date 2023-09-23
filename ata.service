@@ -1,6 +1,6 @@
 [Unit]
 Description=automatic TA service
-OnFailure=tbreak.service
+OnFailure=ata-tbreak.service
 
 [Service]
 ExecStart=/var/orbit/cano.py/mercury/ata.onsub.sh

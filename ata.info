@@ -14,6 +14,7 @@ echo "valid.log lines:	$(test -f "$MD/valid.log" && wc -l < $MD/valid.log || ech
 echo "ata.path status:	$(sysactive ata.path)"
 echo "ata status:		$(sysactive ata.service)"
 echo "tbreak status:		$(sysactive tbreak.service)"
+echo "watchdog status:	$(sysactive watchdog.service)"
 echo "canopy status:		$(sysactive canopy.service)"
 echo "smtp status:		$(sysactive smtp.socket)"
 echo "pop status:		$(sysactive pop.socket)"

@@ -3,18 +3,18 @@ import sys, os, sqlite3
 
 
 INSERT_SUB="""
-INSERT INTO submissions (sub_id, user, time)
-VALUES ("{}","{}","{}");
+INSERT INTO submissions (sub_id, user, time, _from, _to, email_ids, subjects)
+VALUES ("{}","{}","{}","{}","{}","{}","{}");
 """.strip()
 
 GET_SUB_BY_ID="""
-SELECT sub_id, user, time
+SELECT sub_id, user, time, _from, _to, email_ids, subjects
 FROM submissions
 WHERE sub_id = "{}";
 """.strip()
 
 GET_SUB_BY_USER="""
-SELECT sub_id, user, time
+SELECT sub_id, user, time, _from, _to, email_ids, subjects
 FROM submissions
 WHERE user = "{}";
 """.strip()
@@ -39,8 +39,11 @@ FROM assignments;
 TA_DIR=os.path.dirname(os.path.abspath(__file__))
 GRADES_DB=f'{TA_DIR}/grades.db'
 
-def add_sub(sub_id, user, time):
-    do_sqlite3_comm(GRADES_DB, INSERT_SUB.format(sub_id, user, time), commit=True)
+def add_sub(sub_id, user, timestamp, frs, tos, email_ids, sbj):
+    cmd=INSERT_SUB.format(sub_id, user, timestamp, \
+            frs[0], tos[0], ",".join(email_ids), ",".join(sbj))
+    print("running sql:", cmd, "end\nend")
+    do_sqlite3_comm(GRADES_DB, cmd, commit=True)
 
 def get_sub_by_id(sub_id):
     return do_sqlite3_comm(GRADES_DB, GET_SUB_BY_ID.format(sub_id), fetch=True)
@@ -57,7 +60,7 @@ def get_ass():
 def get_ass_by_email_id(email_id):
     return do_sqlite3_comm(GRADES_DB, GET_ASS_BY_WEB_ID.format(email_id), fetch=True)
 
-DP=lambda x: print(x, file=sys.stderr)
+DP=lambda x: print(x, file=sys.stdout)
 
 def do_sqlite3_comm(db, comm, commit=False, fetch=False):
     result=None

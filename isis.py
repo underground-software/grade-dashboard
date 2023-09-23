@@ -8,32 +8,45 @@ from common import get_sub_by_user, get_ass
 
 from orbit import table
 
-def isis_table(ass_pair, subs):
-    fmt = []
-    fmt += [('Submission #', 'Time Recieved', 'Summary',  'Comment', 'Grade')]
+def isis_table(ass_pair, subd):
+    fmt = [('Submission IDs', 'Time Recieved', 'Summary',  'Email IDs', 'Grade')]
+    try:
+        for subgroup in subd[ass_pair[0]]:
+                fmt += [subgroup]
+    except KeyError:
+        pass
 
-    i = 0
-    for sub in subs:
-        fmt += [(i, str(datetime.fromtimestamp(sub[2])), 'lorem', 'ipsum',
-            random.choices(['A','B','C','D','F'])[0])]
-        i += 1
+    try:
+        for subgroup in subd[ass_pair[1]]:
+            fmt += [subgroup]
+    except KeyError:
+        pass
 
+    print('FMT:', str(fmt))
     return table(fmt)
 
 # REVISION INDEX | DATETIME RECV | COMMENTS | GRADE
 def isis(user):
     subs = get_sub_by_user(user)
+    print('GET SUBS', subs)
+    subd = {}
 
-    fmt = []
-    fmt += [('Submission #', 'Time Recieved', 'Summary',  'Comment', 'Grade')]
-    ass = get_ass()
+    for sub in subs:
+        if not sub[4] in subd:
+            subd[sub[4]] = []
+        subd[sub[4]] += [(sub[0], sub[2],
+                sub[6].split(';')[0],
+                "\n".join(sub[5].split(';')),
+                random.choices(['A','B','C','D','F'])[0])]
 
     output =''
     output += f"<h1> {user}'s dashboard</h1>"
 
-    for ass_pair in ass:
-        output += f'<h3>{ass_pair[0]}: {ass_pair[1]}</h3>'
-        output += isis_table(fmt, subs)
+    print('SUBD:', subd)
+
+    for ass_pair in get_ass():
+        output += f'<h3>{ass_pair[0]}: {ass_pair[1]}</h3>\n'
+        output += isis_table(ass_pair, subd)
 
     return output
 

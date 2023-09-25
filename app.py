@@ -68,6 +68,9 @@ def gather_id(env):
     DP(f'path: {path}')
 
     user = get_authorized_user(AUTH_SERVER, env)
+    if user is None:
+        return (None, None, None)
+    user = user.lower()
     DP(f'new login by: {user}')
 
     # TODO

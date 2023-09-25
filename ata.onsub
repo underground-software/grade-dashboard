@@ -1,5 +1,9 @@
 #!/bin/bash
 
+PS4="-|"
+set -e -x
+
+
 export TRIGGER="$1"
 export SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 source $SCRIPT_DIR/ata.conf
@@ -25,10 +29,10 @@ NEW_EMAIL_ID_LIST_TEMP_FILE=$(mktemp)
 head -n $X <(ls -t) > $NEW_EMAIL_ID_LIST_TEMP_FILE
 
 provide_patchset() {
-	count=$(cat $TRIGGER_DIR | tail -n +2 | wc -l)
+	count=$(cat $TRIGGER_DIR/$1 | tail -n +2 | wc -l)
 	mkdir -p "$WORK_DIR"
 	for ((i=1;i<=$count;++i)); do
-			email_id="$(awk -v i=$(($i + 1)) 'NR==i' < $TRIGER_DIR)"
+			email_id="$(awk -v i=$(($i + 1)) 'NR==i' < $TRIGGER_DIR/$sub_id)"
 			$WEBSERVER_DIR/to_eml.py $RAW_DIR/$email_id $WORK_DIR/$email_id
 	done
 }

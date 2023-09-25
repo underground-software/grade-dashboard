@@ -6,13 +6,14 @@ from common import add_sub, get_ass_by_email_id, get_ass_by_web_id
 def new_sub(sub_id, user, timestamp, emails, email_ids):
     tos, frs, sbj = [], [], []
     for e in emails:
-        tos += [e['X-KDLP-Orig-To'].split('@')[0]]
-        frs += [e['X-KDLP-Orig-FRom'].split('@')[0].split('<')[1]]
+        tos += [e['X-KDLP-Orig-To'].split('@')[0].lower()]
+        frs += [e['X-KDLP-Orig-From'].split('@')[0].split('<')[1].lower()]
         sbj += [e['Subject']]
     
     for f in frs:
         print(f"compare  {f} and {user}")
         if f != user:
+            print(f'ata REJECT from:{f} != user:{user}', file=sys.stderr)
             return None
     for i in tos:
         # make sure this is a real assignment (check either name)
@@ -22,10 +23,9 @@ def new_sub(sub_id, user, timestamp, emails, email_ids):
         # is initialized by setup.sh in mercury
         first_try=get_ass_by_email_id(i)
         second_try=get_ass_by_web_id(i)
-        print("SQL\n",first_try, second_try)
+        print("get assignment SQL\n",first_try, second_try, file=sys.stderr)
 
-    print("emailids:", email_ids)
-    print("SBJ", sbj)
+    print(f'ata ACCEPT from:{frs[0]} to:{tos[0]} user:{user} ts:{timestamp}', file=sys.stderr)
         
     return add_sub(sub_id, user, timestamp, frs, tos, email_ids, sbj)
 

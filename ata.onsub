@@ -8,6 +8,8 @@ export TRIGGER="$1"
 export SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 source $SCRIPT_DIR/ata.conf
 
+touch $SCRIPT_DIR/run.count && echo "XXX" >> $SCRIPT_DIR/run.count
+
 echo "TRIGGER FOR $1"
 
 export TRIGGER_DIR="$EMAIL_DIR/$TRIGGER"

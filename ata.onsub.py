@@ -64,7 +64,7 @@ def main():
     # this function returns TODO
     # to reject the submission, triggering an email notification
 
-    print(f'new sub with {len(emails)} emails')
+    print(f'new sub with {len(emails)} emails', file=sys.stderr)
     ret = new_sub(sub_id, user, timestamp, emails, email_ids)
 
     # we'll do something like this

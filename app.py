@@ -5,15 +5,10 @@ from sql import grades_db_exec, \
     STUDENT_LATEST_SUBMISSION_REQ, ASSIGNMENT_LIST_REQ, \
     FIND_STUDENT_ID_REQ, INSERT_NEW_STUDENT_REQ
 
-from loguru import logger
-
 from orbit import ROOT, messageblock, appver, \
-    get_authorized_user, AUTH_SERVER, table
+    get_authorized_user, AUTH_SERVER, table, DP
 
 from isis import isis
-
-def ta_log(msg):
-    logger.info(f'ATA: {msg}')
 
 def build_assignments_list():
     res = []
@@ -70,15 +65,15 @@ def get_id_by_user(user):
 
 def gather_id(env):
     path = env.get('PATH_INFO', '/dashboard')
-    ta_log(f'path: {path}')
+    DP(f'path: {path}')
 
     user = get_authorized_user(AUTH_SERVER, env)
-    ta_log(f'new login by: {user}')
+    DP(f'new login by: {user}')
 
     # TODO
     sid = get_id_by_user(user)
 
-    ta_log(f'found student id: {sid}')
+    DP(f'found student id: {sid}')
 
     return (user, sid, path)
 

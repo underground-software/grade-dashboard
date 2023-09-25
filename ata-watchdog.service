@@ -1,6 +1,0 @@
-[Unit]
-Description=Lazily trigger restart on ata downtime
-
-[Service]
-ExecStart=/var/orbit/cano.py/mercury/ata.watchdog
-WorkingDirectory=/var/orbit/cano.py/mercury

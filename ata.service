@@ -1,8 +1,0 @@
-[Unit]
-Description=automatic TA service
-OnFailure=ata-tbreak.service
-
-[Service]
-ExecStart=/var/orbit/cano.py/mercury/ata.onsub.sh
-WorkingDirectory=/var/orbit/email_data/logs
-Type=exec

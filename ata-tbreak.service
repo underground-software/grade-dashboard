@@ -1,7 +1,0 @@
-[Unit]
-Description=take a tolerance break
-
-[Service]
-ExecStart=/var/orbit/cano.py/mercury/ata.tbreak
-WorkingDirectory=/var/orbit/cano.py/mercury
-Type=exec
